@@ -1,25 +1,28 @@
-function dydt = model(t, arr, y, p)
+function dstates = model(states, t, y, p)
+%MODEL Summary of this function goes here
+%   Detailed explanation goes here
+
     lim = 50e-3;
     if (strcmp(y, "weak"))
         lim = 5e-3;
     end
-
-    if(strcmp(y, "medium")) 
-        lim = 7e-3; 
+    
+    if (strcmp(y, "medium"))
+        lim = 10e-3;
     end
     
-    if (t < lim)
-        dx = arr(2);
-        dv = (1./p.m).*(-p.K.*arr(1)+coilPropertie(arr(1), p).*arr(4).^2);
-        dq = -arr(4);
-        di = (-1./induntace(arr(1), p)).*(p.Res.*arr(4)-arr(3)/p.C + 2.*coilPropertie(arr(1), p).*arr(2).*arr(4));
+    if (states(3) > 0 && t < lim)
+        dx = states(2);
+        dv = (-p.K .* states(1) + xDelInductance(states(1), p) .* states(4).^2 ./ 2) ./ p.m;
+        dq = -states(4);
+        di = -(p.Res .* states(4) - states(3) ./ p.C + xDelInductance(states(1), p) .* states(2) .* states(4)) ./ inductance(states(1), p);
     else
-        dx = arr(2);
-        dv = (1./p.m).*(-p.K.*arr(1)+coilPropertie(arr(1), p).*arr(4).^2);
+        dx = states(2);
+        dv = (-p.K .* states(1) + xDelInductance(states(1), p) .* states(4).^2 ./ 2) ./ p.m;
         dq = 0;
-        di = (-1./induntace(arr(1), p)).*(p.Res.*arr(4)+ 2.*coilPropertie(arr(1), p).*arr(2).*arr(4));
+        di = -(p.Res .* states(4) + xDelInductance(states(1), p) .* states(2) .* states(4)) ./ inductance(states(1), p);
     end
 
-    dydt = [dx; dv; dq; di];
-end
+    dstates = [dx; dv; dq; di];
 
+end

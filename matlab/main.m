@@ -1,10 +1,15 @@
 clc; clear; close all;
 
 p = parameters();
-y = "medium";
+y = "weak";
+f = @(t, states) model(states, t, y, p);
 
-f = @(t, x) model(t, x, y, p);
+[t, y] = ode45(f, [0 0.1], p.IC);
 
-[t, x] = ode45(f, [0 0.1], p.IC);
-plot(t,x,'LineWidth',2)
+plot(t, y, 'LineWidth', 2)
 grid on
+
+xlabel("Tempo (s)");
+
+legend("x", "v", "q", "i");
+
